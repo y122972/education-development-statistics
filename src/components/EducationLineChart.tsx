@@ -3,6 +3,7 @@ import {
   CartesianGrid,
   Line,
   LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -16,6 +17,8 @@ interface EducationLineChartProps {
   title: string
   description: string
   unit: string
+  selectedYear: number
+  onYearSelect: (year: number) => void
 }
 
 function formatChartValue(value: number) {
@@ -48,6 +51,7 @@ function CustomTooltip({
           </p>
         ))}
       </div>
+      <p className="chart-tooltip-action">点击锁定该年度</p>
     </div>
   )
 }
@@ -58,6 +62,8 @@ export default function EducationLineChart({
   title,
   description,
   unit,
+  selectedYear,
+  onYearSelect,
 }: EducationLineChartProps) {
   const [hiddenKeys, setHiddenKeys] = useState<Set<string>>(() => new Set())
   const visibleMetrics = useMemo(
@@ -113,7 +119,12 @@ export default function EducationLineChart({
           <LineChart
             accessibilityLayer
             data={data}
+            cursor="pointer"
             margin={{ top: 12, right: 14, left: 0, bottom: 0 }}
+            onClick={(state) => {
+              const year = Number(state.activeLabel)
+              if (Number.isInteger(year)) onYearSelect(year)
+            }}
           >
             <CartesianGrid vertical={false} stroke="var(--line)" />
             <XAxis
@@ -134,6 +145,12 @@ export default function EducationLineChart({
             <Tooltip
               cursor={{ stroke: 'var(--ink)', strokeDasharray: '4 4', strokeOpacity: 0.35 }}
               content={<CustomTooltip unit={unit} />}
+            />
+            <ReferenceLine
+              x={selectedYear}
+              stroke="var(--accent)"
+              strokeDasharray="3 4"
+              strokeWidth={1.5}
             />
             {visibleMetrics.map((metric) => (
               <Line

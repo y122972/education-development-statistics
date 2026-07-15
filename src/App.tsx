@@ -9,11 +9,18 @@ import {
   type MetricMeta,
   type YearData,
 } from './data/educationData'
+import {
+  calculateChangeRate,
+  formatChangeRate,
+  formatDelta,
+  formatValue,
+} from './data/statisticsFormatting'
 
 const EducationLineChart = lazy(() => import('./components/EducationLineChart'))
 const BulletinArchive = lazy(() => import('./components/BulletinArchive'))
+const LatestYearOverview = lazy(() => import('./components/LatestYearOverview'))
 
-type ViewId = 'overview' | 'archive'
+type ViewId = 'snapshot' | 'overview' | 'archive'
 type CategoryId = 'enrollment' | 'schools' | 'teachers' | 'rates'
 
 interface Category {
@@ -60,6 +67,24 @@ const categories: Category[] = [
   },
 ]
 
+const snapshotCategories = categories.map((category) => {
+  if (category.id !== 'schools') return category
+  return {
+    ...category,
+    label: '学校数量',
+    description: '对照基础教育学校与普通、职业高等学校的最新规模。',
+    metrics: [
+      ...category.metrics,
+      {
+        key: 'higherEduInstitutionCount',
+        label: '普通、职业高等学校',
+        unit: '所',
+        color: '#4f7653',
+      } satisfies MetricMeta,
+    ],
+  }
+})
+
 const headlineMetrics: Array<{
   key: keyof Omit<YearData, 'year'>
   label: string
@@ -71,16 +96,6 @@ const headlineMetrics: Array<{
   { key: 'higherEduGrossRate', label: '高等教育毛入学率', unit: '%' },
 ]
 
-function formatValue(value: number) {
-  return value.toLocaleString('zh-CN', { maximumFractionDigits: 2 })
-}
-
-function formatDelta(delta: number, unit: string) {
-  const sign = delta > 0 ? '+' : ''
-  if (unit === '%') return `${sign}${formatValue(delta)} 个百分点`
-  return `${sign}${formatValue(delta)} ${unit}`
-}
-
 function LoadingPanel() {
   return (
     <div className="content-loading" role="status">
@@ -91,20 +106,29 @@ function LoadingPanel() {
 }
 
 function App() {
-  const [view, setView] = useState<ViewId>(() =>
-    window.location.hash.startsWith('#archive') ? 'archive' : 'overview',
-  )
+  const [view, setView] = useState<ViewId>(() => {
+    if (window.location.hash.startsWith('#archive')) return 'archive'
+    if (window.location.hash.startsWith('#overview')) return 'overview'
+    return 'snapshot'
+  })
   const [activeCategoryId, setActiveCategoryId] = useState<CategoryId>('enrollment')
+  const [selectedYear, setSelectedYear] = useState(
+    () => educationData.at(-1)?.year ?? new Date().getFullYear(),
+  )
   const activeCategory =
     categories.find((category) => category.id === activeCategoryId) ?? categories[0]
   const latest = educationData.at(-1)
   const previous = educationData.at(-2)
+  const earliest = educationData[0]
+  const selectedYearIndex = educationData.findIndex((item) => item.year === selectedYear)
+  const selectedData = educationData[selectedYearIndex]
+  const comparisonData = selectedYearIndex > 0 ? educationData[selectedYearIndex - 1] : undefined
 
   const categoryChanges = useMemo(() => {
-    if (!latest || !previous) return []
+    if (!selectedData) return []
     return activeCategory.metrics.map((metric) => {
-      const current = latest[metric.key]
-      const baseline = previous[metric.key]
+      const current = selectedData[metric.key]
+      const baseline = comparisonData?.[metric.key]
       return {
         ...metric,
         current,
@@ -112,13 +136,23 @@ function App() {
           typeof current === 'number' && typeof baseline === 'number'
             ? current - baseline
             : null,
+        changeRate:
+          typeof current === 'number' && typeof baseline === 'number'
+            ? calculateChangeRate(current, baseline)
+            : null,
       }
     })
-  }, [activeCategory, latest, previous])
+  }, [activeCategory, comparisonData, selectedData])
 
   useEffect(() => {
     function syncViewWithHash() {
-      setView(window.location.hash.startsWith('#archive') ? 'archive' : 'overview')
+      if (window.location.hash.startsWith('#archive')) {
+        setView('archive')
+      } else if (window.location.hash.startsWith('#overview')) {
+        setView('overview')
+      } else {
+        setView('snapshot')
+      }
     }
 
     window.addEventListener('hashchange', syncViewWithHash)
@@ -126,7 +160,7 @@ function App() {
   }, [])
 
   function navigate(nextView: ViewId) {
-    const nextHash = nextView === 'archive' ? '#archive' : '#overview'
+    const nextHash = `#${nextView}`
     if (window.location.hash === nextHash) {
       setView(nextView)
     } else {
@@ -138,7 +172,7 @@ function App() {
   return (
     <div className="app-shell">
       <header className="site-header">
-        <button className="brand" type="button" onClick={() => navigate('overview')}>
+        <button className="brand" type="button" onClick={() => navigate('snapshot')}>
           <span className="brand-seal" aria-hidden="true">教</span>
           <span>
             <strong>中国教育数据档案</strong>
@@ -149,11 +183,19 @@ function App() {
         <nav className="primary-nav" aria-label="主要页面">
           <button
             type="button"
+            className={view === 'snapshot' ? 'active' : ''}
+            aria-current={view === 'snapshot' ? 'page' : undefined}
+            onClick={() => navigate('snapshot')}
+          >
+            年度速览
+          </button>
+          <button
+            type="button"
             className={view === 'overview' ? 'active' : ''}
             aria-current={view === 'overview' ? 'page' : undefined}
             onClick={() => navigate('overview')}
           >
-            趋势总览
+            长期趋势
           </button>
           <button
             type="button"
@@ -176,12 +218,22 @@ function App() {
       </header>
 
       <main>
-        {view === 'overview' ? (
+        {view === 'snapshot' && latest && previous ? (
+          <Suspense fallback={<LoadingPanel />}>
+            <LatestYearOverview
+              latest={latest}
+              previous={previous}
+              categories={snapshotCategories}
+              headlineMetrics={headlineMetrics}
+              onOpenArchive={() => navigate('archive')}
+            />
+          </Suspense>
+        ) : view === 'overview' ? (
           <div className="overview-page" data-screen-label="趋势总览">
             <section className="hero-section">
               <div className="hero-copy">
-                <p className="eyebrow">全国教育事业发展统计公报 · 2011—{latest?.year}</p>
-                <h1>读懂中国教育的<br />十五年变化</h1>
+                <p className="eyebrow">全国教育事业发展统计公报 · {earliest?.year}—{latest?.year}</p>
+                <h1>读懂中国教育的<br />长期变化</h1>
                 <p className="hero-intro">
                   把分散在历年公报中的学校、学生、教师与教育普及数据，整理成可比较、
                   可回到原文核验的长期档案。
@@ -202,6 +254,10 @@ function App() {
                   typeof current === 'number' && typeof baseline === 'number'
                     ? current - baseline
                     : null
+                const changeRate =
+                  typeof current === 'number' && typeof baseline === 'number'
+                    ? calculateChangeRate(current, baseline)
+                    : null
                 return (
                   <article className="headline-stat" key={metric.key}>
                     <p>{metric.label}</p>
@@ -212,6 +268,9 @@ function App() {
                     {typeof delta === 'number' ? (
                       <small className={delta < 0 ? 'negative' : 'positive'}>
                         较上年 {formatDelta(delta, metric.unit)}
+                        {typeof changeRate === 'number' && (
+                          <> · 同比 {formatChangeRate(changeRate)}</>
+                        )}
                       </small>
                     ) : (
                       <small>该年公报未单列</small>
@@ -227,7 +286,7 @@ function App() {
                   <p className="section-kicker">01 · 长期趋势</p>
                   <h2>选择一个观察维度</h2>
                 </div>
-                <p>点击指标标签可隐藏或重新显示曲线。</p>
+                <p>悬停年份查看数据，点击图表可切换右侧年度面板；点击指标标签可隐藏曲线。</p>
               </div>
 
               <div className="category-switch" role="tablist" aria-label="趋势指标类别">
@@ -254,12 +313,16 @@ function App() {
                     title={activeCategory.title}
                     description={activeCategory.description}
                     unit={activeCategory.unit}
+                    selectedYear={selectedYear}
+                    onYearSelect={setSelectedYear}
                   />
                 </Suspense>
 
                 <aside className="change-panel">
-                  <p className="section-kicker">{latest?.year} 年变化</p>
-                  <h3>较上一年度</h3>
+                  <p className="section-kicker">{selectedData?.year} 年数据</p>
+                  <h3>
+                    {comparisonData ? `较 ${comparisonData.year} 年度` : '首个收录年度'}
+                  </h3>
                   <div className="change-list">
                     {categoryChanges.map((metric) => (
                       <div className="change-item" key={metric.key}>
@@ -270,6 +333,14 @@ function App() {
                         {typeof metric.delta === 'number' && (
                           <small className={metric.delta < 0 ? 'negative' : 'positive'}>
                             {formatDelta(metric.delta, activeCategory.unit)}
+                            {typeof metric.changeRate === 'number' && (
+                              <> · 同比 {formatChangeRate(metric.changeRate)}</>
+                            )}
+                          </small>
+                        )}
+                        {typeof metric.delta !== 'number' && (
+                          <small className="unavailable">
+                            {typeof metric.current === 'number' ? '暂无上年可比数据' : '该年公报未单列'}
                           </small>
                         )}
                       </div>
