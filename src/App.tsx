@@ -207,14 +207,25 @@ function App() {
           </button>
         </nav>
 
-        <a
-          className="header-source"
-          href="https://www.moe.gov.cn/jyb_sjzl/sjzl_fztjgb/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          数据来源：教育部 <span aria-hidden="true">↗</span>
-        </a>
+        <div className="justify-self-end flex items-center gap-4 max-[1040px]:hidden">
+          <a
+            className="header-source"
+            href="https://www.moe.gov.cn/jyb_sjzl/sjzl_fztjgb/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            数据来源：教育部 <span aria-hidden="true">↗</span>
+          </a>
+          <a
+            className="header-source"
+            href="https://github.com/y122972/education-development-statistics"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="GitHub 仓库"
+          >
+            GitHub <span aria-hidden="true">↗</span>
+          </a>
+        </div>
       </header>
 
       <main>

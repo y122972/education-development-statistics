@@ -1,5 +1,7 @@
 # 中国教育数据档案
 
+**在线访问：[https://y122972.github.io/education-development-statistics/](https://y122972.github.io/education-development-statistics/)**
+
 将教育部 1998–2025 年《全国教育事业发展统计公报》整理成可查看最新年度、跨年趋势、可搜索数字原句、可回到官方原文核验的数据档案。
 
 ## 本地运行
