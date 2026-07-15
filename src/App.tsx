@@ -207,7 +207,7 @@ function App() {
           </button>
         </nav>
 
-        <div className="header-actions">
+        <div className="justify-self-end flex items-center gap-4 max-[1040px]:hidden">
           <a
             className="header-source"
             href="https://www.moe.gov.cn/jyb_sjzl/sjzl_fztjgb/"

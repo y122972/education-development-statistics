@@ -92,13 +92,6 @@
   background: var(--ink);
 }
 
-.header-actions {
-  justify-self: end;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
 .header-source {
   color: var(--text-muted);
   font-size: 12px;
@@ -1204,10 +1197,6 @@ main {
 @media (max-width: 1040px) {
   .site-header {
     grid-template-columns: 1fr auto;
-  }
-
-  .header-actions {
-    display: none;
   }
 
   .header-source {
