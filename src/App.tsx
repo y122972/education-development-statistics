@@ -1,106 +1,314 @@
-import { useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import './App.css'
-import EducationLineChart from './components/EducationLineChart'
 import {
   educationData,
   enrollmentMetrics,
+  grossRateMetrics,
   schoolCountMetrics,
   teacherMetrics,
-  grossRateMetrics,
+  type MetricMeta,
+  type YearData,
 } from './data/educationData'
 
-type TabId = 'enrollment' | 'schools' | 'teachers' | 'rates'
+const EducationLineChart = lazy(() => import('./components/EducationLineChart'))
+const BulletinArchive = lazy(() => import('./components/BulletinArchive'))
 
-const tabs: { id: TabId; label: string }[] = [
-  { id: 'enrollment', label: '在校生规模' },
-  { id: 'schools', label: '学校数量' },
-  { id: 'teachers', label: '专任教师' },
-  { id: 'rates', label: '毛入学率' },
+type ViewId = 'overview' | 'archive'
+type CategoryId = 'enrollment' | 'schools' | 'teachers' | 'rates'
+
+interface Category {
+  id: CategoryId
+  label: string
+  title: string
+  description: string
+  unit: string
+  metrics: MetricMeta[]
+}
+
+const categories: Category[] = [
+  {
+    id: 'enrollment',
+    label: '学生规模',
+    title: '各级教育在校生规模',
+    description: '观察不同学段规模变化；2021 年中职口径发生调整，跨点比较需结合原文。',
+    unit: '万人',
+    metrics: enrollmentMetrics,
+  },
+  {
+    id: 'schools',
+    label: '学校数量',
+    title: '基础教育学校数量',
+    description: '学校数量变化同时受到适龄人口、城镇化与布局调整影响。',
+    unit: '万所',
+    metrics: schoolCountMetrics,
+  },
+  {
+    id: 'teachers',
+    label: '专任教师',
+    title: '各级学校专任教师数量',
+    description: '对比各学段教师队伍规模；早期公报未单列学前专任教师的年份保留为空。',
+    unit: '万人',
+    metrics: teacherMetrics,
+  },
+  {
+    id: 'rates',
+    label: '普及水平',
+    title: '教育普及与巩固水平',
+    description: '毛入学率与巩固率反映各阶段教育机会覆盖程度。',
+    unit: '%',
+    metrics: grossRateMetrics,
+  },
 ]
 
+const headlineMetrics: Array<{
+  key: keyof Omit<YearData, 'year'>
+  label: string
+  unit: string
+}> = [
+  { key: 'primaryEnrollment', label: '小学在校生', unit: '万人' },
+  { key: 'juniorHighEnrollment', label: '初中在校生', unit: '万人' },
+  { key: 'higherEnrollment', label: '高校本专科在校生', unit: '万人' },
+  { key: 'higherEduGrossRate', label: '高等教育毛入学率', unit: '%' },
+]
+
+function formatValue(value: number) {
+  return value.toLocaleString('zh-CN', { maximumFractionDigits: 2 })
+}
+
+function formatDelta(delta: number, unit: string) {
+  const sign = delta > 0 ? '+' : ''
+  if (unit === '%') return `${sign}${formatValue(delta)} 个百分点`
+  return `${sign}${formatValue(delta)} ${unit}`
+}
+
+function LoadingPanel() {
+  return (
+    <div className="content-loading" role="status">
+      <span className="loading-mark" aria-hidden="true" />
+      正在载入数据视图…
+    </div>
+  )
+}
+
 function App() {
-  const [activeTab, setActiveTab] = useState<TabId>('enrollment')
+  const [view, setView] = useState<ViewId>(() =>
+    window.location.hash.startsWith('#archive') ? 'archive' : 'overview',
+  )
+  const [activeCategoryId, setActiveCategoryId] = useState<CategoryId>('enrollment')
+  const activeCategory =
+    categories.find((category) => category.id === activeCategoryId) ?? categories[0]
+  const latest = educationData.at(-1)
+  const previous = educationData.at(-2)
+
+  const categoryChanges = useMemo(() => {
+    if (!latest || !previous) return []
+    return activeCategory.metrics.map((metric) => {
+      const current = latest[metric.key]
+      const baseline = previous[metric.key]
+      return {
+        ...metric,
+        current,
+        delta:
+          typeof current === 'number' && typeof baseline === 'number'
+            ? current - baseline
+            : null,
+      }
+    })
+  }, [activeCategory, latest, previous])
+
+  useEffect(() => {
+    function syncViewWithHash() {
+      setView(window.location.hash.startsWith('#archive') ? 'archive' : 'overview')
+    }
+
+    window.addEventListener('hashchange', syncViewWithHash)
+    return () => window.removeEventListener('hashchange', syncViewWithHash)
+  }, [])
+
+  function navigate(nextView: ViewId) {
+    const nextHash = nextView === 'archive' ? '#archive' : '#overview'
+    if (window.location.hash === nextHash) {
+      setView(nextView)
+    } else {
+      window.location.hash = nextHash
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>全国教育事业发展统计</h1>
-        <p>
-          数据来源：
-          <a
-            href="http://www.moe.gov.cn/jyb_sjzl/sjzl_fztjgb/"
-            target="_blank"
-            rel="noreferrer"
+    <div className="app-shell">
+      <header className="site-header">
+        <button className="brand" type="button" onClick={() => navigate('overview')}>
+          <span className="brand-seal" aria-hidden="true">教</span>
+          <span>
+            <strong>中国教育数据档案</strong>
+            <small>Education statistics archive</small>
+          </span>
+        </button>
+
+        <nav className="primary-nav" aria-label="主要页面">
+          <button
+            type="button"
+            className={view === 'overview' ? 'active' : ''}
+            aria-current={view === 'overview' ? 'page' : undefined}
+            onClick={() => navigate('overview')}
           >
-            中华人民共和国教育部全国教育事业发展统计公报
-          </a>
-          ，覆盖 2011–2023 年
-        </p>
+            趋势总览
+          </button>
+          <button
+            type="button"
+            className={view === 'archive' ? 'active' : ''}
+            aria-current={view === 'archive' ? 'page' : undefined}
+            onClick={() => navigate('archive')}
+          >
+            公报档案
+          </button>
+        </nav>
+
+        <a
+          className="header-source"
+          href="https://www.moe.gov.cn/jyb_sjzl/sjzl_fztjgb/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          数据来源：教育部 <span aria-hidden="true">↗</span>
+        </a>
       </header>
 
-      <nav className="tab-nav" role="tablist">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            role="tab"
-            aria-selected={activeTab === tab.id}
-            className={`tab-btn${activeTab === tab.id ? ' active' : ''}`}
-            onClick={() => setActiveTab(tab.id)}
-            type="button"
-          >
-            {tab.label}
-          </button>
-        ))}
-      </nav>
+      <main>
+        {view === 'overview' ? (
+          <div className="overview-page" data-screen-label="趋势总览">
+            <section className="hero-section">
+              <div className="hero-copy">
+                <p className="eyebrow">全国教育事业发展统计公报 · 2011—{latest?.year}</p>
+                <h1>读懂中国教育的<br />十五年变化</h1>
+                <p className="hero-intro">
+                  把分散在历年公报中的学校、学生、教师与教育普及数据，整理成可比较、
+                  可回到原文核验的长期档案。
+                </p>
+              </div>
+              <div className="hero-stamp" aria-label={`最新数据年份 ${latest?.year} 年`}>
+                <span>最新公报数据</span>
+                <strong>{latest?.year}</strong>
+                <small>共 {educationData.length} 个年度</small>
+              </div>
+            </section>
 
-      <main className="charts-grid">
-        {activeTab === 'enrollment' && (
-          <>
-            <EducationLineChart
-              data={educationData}
-              metrics={enrollmentMetrics.slice(0, 4)}
-              title="基础教育各阶段在校生规模（2011–2023）"
-              unit="万人"
-            />
-            <EducationLineChart
-              data={educationData}
-              metrics={enrollmentMetrics.slice(4)}
-              title="职业教育与高等教育在校生规模（2011–2023）"
-              unit="万人"
-            />
-          </>
-        )}
-        {activeTab === 'schools' && (
-          <EducationLineChart
-            data={educationData}
-            metrics={schoolCountMetrics}
-            title="各级学校数量变化（2011–2023）"
-            unit="万所"
-          />
-        )}
-        {activeTab === 'teachers' && (
-          <EducationLineChart
-            data={educationData}
-            metrics={teacherMetrics}
-            title="各级各类学校专任教师数量（2011–2023）"
-            unit="万人"
-          />
-        )}
-        {activeTab === 'rates' && (
-          <EducationLineChart
-            data={educationData}
-            metrics={grossRateMetrics}
-            title="各级教育毛入学率与巩固率（2011–2023）"
-            unit="%"
-          />
+            <section className="headline-grid" aria-label={`${latest?.year} 年重点数据`}>
+              {headlineMetrics.map((metric) => {
+                const current = latest?.[metric.key]
+                const baseline = previous?.[metric.key]
+                const delta =
+                  typeof current === 'number' && typeof baseline === 'number'
+                    ? current - baseline
+                    : null
+                return (
+                  <article className="headline-stat" key={metric.key}>
+                    <p>{metric.label}</p>
+                    <div>
+                      <strong>{typeof current === 'number' ? formatValue(current) : '—'}</strong>
+                      <span>{metric.unit}</span>
+                    </div>
+                    {typeof delta === 'number' ? (
+                      <small className={delta < 0 ? 'negative' : 'positive'}>
+                        较上年 {formatDelta(delta, metric.unit)}
+                      </small>
+                    ) : (
+                      <small>该年公报未单列</small>
+                    )}
+                  </article>
+                )
+              })}
+            </section>
+
+            <section className="trend-section">
+              <div className="section-heading-row">
+                <div>
+                  <p className="section-kicker">01 · 长期趋势</p>
+                  <h2>选择一个观察维度</h2>
+                </div>
+                <p>点击指标标签可隐藏或重新显示曲线。</p>
+              </div>
+
+              <div className="category-switch" role="tablist" aria-label="趋势指标类别">
+                {categories.map((category) => (
+                  <button
+                    type="button"
+                    role="tab"
+                    key={category.id}
+                    aria-selected={activeCategoryId === category.id}
+                    className={activeCategoryId === category.id ? 'active' : ''}
+                    onClick={() => setActiveCategoryId(category.id)}
+                  >
+                    {category.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="trend-grid">
+                <Suspense fallback={<LoadingPanel />}>
+                  <EducationLineChart
+                    key={activeCategory.id}
+                    data={educationData}
+                    metrics={activeCategory.metrics}
+                    title={activeCategory.title}
+                    description={activeCategory.description}
+                    unit={activeCategory.unit}
+                  />
+                </Suspense>
+
+                <aside className="change-panel">
+                  <p className="section-kicker">{latest?.year} 年变化</p>
+                  <h3>较上一年度</h3>
+                  <div className="change-list">
+                    {categoryChanges.map((metric) => (
+                      <div className="change-item" key={metric.key}>
+                        <span>{metric.label}</span>
+                        <strong>
+                          {typeof metric.current === 'number' ? formatValue(metric.current) : '—'}
+                        </strong>
+                        {typeof metric.delta === 'number' && (
+                          <small className={metric.delta < 0 ? 'negative' : 'positive'}>
+                            {formatDelta(metric.delta, activeCategory.unit)}
+                          </small>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <button className="archive-cta" type="button" onClick={() => navigate('archive')}>
+                    去公报原文核验 <span aria-hidden="true">→</span>
+                  </button>
+                </aside>
+              </div>
+            </section>
+
+            <section className="method-section">
+              <div>
+                <p className="section-kicker">02 · 数据说明</p>
+                <h2>每一个数字，都能回到出处</h2>
+              </div>
+              <p>
+                趋势数据按教育部历年公报的原始口径整理；遇到统计口径或名称变化时，
+                原句与单位会保留在对应年度档案中。图表用于观察变化，不替代官方公报。
+              </p>
+              <button type="button" onClick={() => navigate('archive')}>
+                浏览全部年度公报
+              </button>
+            </section>
+          </div>
+        ) : (
+          <div className="archive-page" data-screen-label="公报档案">
+            <Suspense fallback={<LoadingPanel />}>
+              <BulletinArchive />
+            </Suspense>
+          </div>
         )}
       </main>
 
-      <footer className="app-footer">
-        <p>
-          注：数据来自教育部历年《全国教育事业发展统计公报》，如需获取最新数据，
-          可运行 <code>pnpm scrape</code> 脚本。
-        </p>
+      <footer className="site-footer">
+        <span>中国教育数据档案</span>
+        <p>数据来源：中华人民共和国教育部《全国教育事业发展统计公报》</p>
+        <span>更新于 2026 年 7 月</span>
       </footer>
     </div>
   )

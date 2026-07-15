@@ -1,157 +1,151 @@
 /**
- * 全国教育事业发展统计公报 数据
- * 数据来源: 中华人民共和国教育部
- * http://www.moe.gov.cn/jyb_sjzl/sjzl_fztjgb/
+ * 用于跨年趋势图的标准化数据。
  *
- * 单位说明:
- *   在校生/在园幼儿: 万人
- *   学校数: 万所 (幼/小/初), 所 (高中/高校)
- *   专任教师: 万人
- *   毛入学率: %
+ * 数据逐年人工核对自 public/data/bulletins/<year>.json 中保留的教育部公报原句。
+ * 人数统一换算为“万人”，基础教育学校数统一换算为“万所”。若某年公报未单列
+ * 同口径指标，则保留为 null，不用推算值补齐。
  */
+
+type MetricValue = number | null
 
 export interface YearData {
   year: number
-  /** 学前教育在园幼儿 (万人) */
-  preschoolEnrollment: number
-  /** 小学在校生 (万人) */
-  primaryEnrollment: number
-  /** 初中在校生 (万人) */
-  juniorHighEnrollment: number
-  /** 普通高中在校生 (万人) */
-  seniorHighEnrollment: number
-  /** 中等职业学校在校生 (万人) */
-  vocationalEnrollment: number
-  /** 普通高等学校本专科在校生 (万人) */
-  higherEnrollment: number
-  /** 研究生在校生 (万人) */
-  graduateEnrollment: number
-  /** 幼儿园数 (万所) */
-  kindergartenCount: number
-  /** 小学数 (万所) */
-  primarySchoolCount: number
-  /** 初中数 (万所) */
-  juniorHighSchoolCount: number
-  /** 普通高中数 (万所) */
-  seniorHighSchoolCount: number
-  /** 普通高等学校数 (所) */
-  higherEduInstitutionCount: number
-  /** 幼儿园专任教师 (万人) */
-  kindergartenTeachers: number
-  /** 小学专任教师 (万人) */
-  primaryTeachers: number
-  /** 初中专任教师 (万人) */
-  juniorHighTeachers: number
-  /** 普通高中专任教师 (万人) */
-  seniorHighTeachers: number
-  /** 普通高等学校专任教师 (万人) */
-  higherEduTeachers: number
-  /** 学前三年毛入学率 (%) */
-  preschoolGrossRate: number
-  /** 九年义务教育巩固率 (%) */
-  compulsoryRetentionRate: number
-  /** 高中阶段毛入学率 (%) */
-  seniorHighGrossRate: number
-  /** 高等教育毛入学率 (%) */
-  higherEduGrossRate: number
+  /** 学前教育在园幼儿（万人） */
+  preschoolEnrollment: MetricValue
+  /** 小学阶段在校生（万人） */
+  primaryEnrollment: MetricValue
+  /** 初中阶段在校生（万人） */
+  juniorHighEnrollment: MetricValue
+  /** 普通高中在校生（万人） */
+  seniorHighEnrollment: MetricValue
+  /** 中等职业教育在校生（万人） */
+  vocationalEnrollment: MetricValue
+  /** 普通、职业本专科在校生（万人） */
+  higherEnrollment: MetricValue
+  /** 在学研究生（万人） */
+  graduateEnrollment: MetricValue
+  /** 幼儿园数（万所） */
+  kindergartenCount: MetricValue
+  /** 普通小学数（万所） */
+  primarySchoolCount: MetricValue
+  /** 初中数（万所） */
+  juniorHighSchoolCount: MetricValue
+  /** 普通高中数（万所） */
+  seniorHighSchoolCount: MetricValue
+  /** 普通、职业高等学校数，不含成人高校（所） */
+  higherEduInstitutionCount: MetricValue
+  /** 学前教育专任教师（万人） */
+  kindergartenTeachers: MetricValue
+  /** 小学阶段教育专任教师（万人） */
+  primaryTeachers: MetricValue
+  /** 初中阶段教育专任教师（万人） */
+  juniorHighTeachers: MetricValue
+  /** 普通高中教育专任教师（万人） */
+  seniorHighTeachers: MetricValue
+  /** 普通、职业高等学校专任教师，不含成人高校（万人） */
+  higherEduTeachers: MetricValue
+  /** 学前教育毛入园率（%） */
+  preschoolGrossRate: MetricValue
+  /** 九年义务教育巩固率（%） */
+  compulsoryRetentionRate: MetricValue
+  /** 高中阶段毛入学率（%） */
+  seniorHighGrossRate: MetricValue
+  /** 高等教育毛入学率（%） */
+  higherEduGrossRate: MetricValue
 }
 
-/**
- * 数据来自教育部历年全国教育事业发展统计公报
- * 覆盖 2011–2023 年度
- */
 export const educationData: YearData[] = [
   {
     year: 2011,
-    preschoolEnrollment: 3480.1,
-    primaryEnrollment: 9116.6,
-    juniorHighEnrollment: 5049.7,
-    seniorHighEnrollment: 2453.7,
-    vocationalEnrollment: 2197.3,
-    higherEnrollment: 2308.5,
-    graduateEnrollment: 164.6,
-    kindergartenCount: 16.69,
-    primarySchoolCount: 24.09,
-    juniorHighSchoolCount: 5.49,
-    seniorHighSchoolCount: 1.34,
+    preschoolEnrollment: 3424.45,
+    primaryEnrollment: 9926.37,
+    juniorHighEnrollment: 5066.8,
+    seniorHighEnrollment: 2454.82,
+    vocationalEnrollment: 2205.33,
+    higherEnrollment: 2308.51,
+    graduateEnrollment: 164.58,
+    kindergartenCount: 16.68,
+    primarySchoolCount: 24.12,
+    juniorHighSchoolCount: 5.41,
+    seniorHighSchoolCount: 1.3688,
     higherEduInstitutionCount: 2409,
-    kindergartenTeachers: 95.1,
-    primaryTeachers: 559.6,
-    juniorHighTeachers: 359.0,
-    seniorHighTeachers: 167.7,
-    higherEduTeachers: 144.0,
+    kindergartenTeachers: null,
+    primaryTeachers: 560.49,
+    juniorHighTeachers: 352.45,
+    seniorHighTeachers: 155.68,
+    higherEduTeachers: 139.27,
     preschoolGrossRate: 62.3,
-    compulsoryRetentionRate: 91.8,
-    seniorHighGrossRate: 84.0,
+    compulsoryRetentionRate: null,
+    seniorHighGrossRate: 84,
     higherEduGrossRate: 26.9,
   },
   {
     year: 2012,
-    preschoolEnrollment: 3685.8,
-    primaryEnrollment: 9389.5,
-    juniorHighEnrollment: 4705.6,
-    seniorHighEnrollment: 2450.7,
-    vocationalEnrollment: 2193.1,
-    higherEnrollment: 2391.3,
-    graduateEnrollment: 171.8,
-    kindergartenCount: 18.08,
-    primarySchoolCount: 22.84,
+    preschoolEnrollment: 3685.76,
+    primaryEnrollment: 9695.9,
+    juniorHighEnrollment: 4763.06,
+    seniorHighEnrollment: 2467.17,
+    vocationalEnrollment: 2113.69,
+    higherEnrollment: 2391.32,
+    graduateEnrollment: 171.98,
+    kindergartenCount: 18.13,
+    primarySchoolCount: 22.86,
     juniorHighSchoolCount: 5.32,
-    seniorHighSchoolCount: 1.33,
+    seniorHighSchoolCount: 1.3509,
     higherEduInstitutionCount: 2442,
-    kindergartenTeachers: 107.8,
-    primaryTeachers: 563.1,
-    juniorHighTeachers: 349.7,
-    seniorHighTeachers: 167.4,
-    higherEduTeachers: 149.6,
+    kindergartenTeachers: null,
+    primaryTeachers: 558.55,
+    juniorHighTeachers: 350.44,
+    seniorHighTeachers: 159.5,
+    higherEduTeachers: 144.03,
     preschoolGrossRate: 64.5,
-    compulsoryRetentionRate: 92.1,
-    seniorHighGrossRate: 85.0,
-    higherEduGrossRate: 30.0,
+    compulsoryRetentionRate: 91.8,
+    seniorHighGrossRate: 85,
+    higherEduGrossRate: 30,
   },
   {
     year: 2013,
-    preschoolEnrollment: 3894.9,
-    primaryEnrollment: 9360.5,
-    juniorHighEnrollment: 4384.3,
-    seniorHighEnrollment: 2471.7,
-    vocationalEnrollment: 2199.5,
-    higherEnrollment: 2468.1,
+    preschoolEnrollment: 3894.69,
+    primaryEnrollment: 9360.55,
+    juniorHighEnrollment: 4440.12,
+    seniorHighEnrollment: 2435.88,
+    vocationalEnrollment: 1922.97,
+    higherEnrollment: 2468.07,
     graduateEnrollment: 179.4,
     kindergartenCount: 19.86,
     primarySchoolCount: 21.35,
-    juniorHighSchoolCount: 5.21,
-    seniorHighSchoolCount: 1.35,
+    juniorHighSchoolCount: 5.28,
+    seniorHighSchoolCount: 1.34,
     higherEduInstitutionCount: 2491,
-    kindergartenTeachers: 118.7,
-    primaryTeachers: 558.3,
-    juniorHighTeachers: 341.8,
-    seniorHighTeachers: 169.3,
-    higherEduTeachers: 153.6,
+    kindergartenTeachers: null,
+    primaryTeachers: 558.46,
+    juniorHighTeachers: 348.1,
+    seniorHighTeachers: 162.9,
+    higherEduTeachers: 149.69,
     preschoolGrossRate: 67.5,
     compulsoryRetentionRate: 92.3,
-    seniorHighGrossRate: 86.0,
+    seniorHighGrossRate: 86,
     higherEduGrossRate: 34.5,
   },
   {
     year: 2014,
-    preschoolEnrollment: 4050.7,
-    primaryEnrollment: 9389.8,
-    juniorHighEnrollment: 4319.3,
-    seniorHighEnrollment: 2428.2,
-    vocationalEnrollment: 2212.4,
+    preschoolEnrollment: 4050.71,
+    primaryEnrollment: 9451.07,
+    juniorHighEnrollment: 4384.63,
+    seniorHighEnrollment: 2400.47,
+    vocationalEnrollment: 1755.28,
     higherEnrollment: 2547.7,
-    graduateEnrollment: 184.8,
-    kindergartenCount: 20.97,
+    graduateEnrollment: 184.77,
+    kindergartenCount: 20.99,
     primarySchoolCount: 20.14,
-    juniorHighSchoolCount: 5.21,
-    seniorHighSchoolCount: 1.35,
+    juniorHighSchoolCount: 5.26,
+    seniorHighSchoolCount: 1.33,
     higherEduInstitutionCount: 2529,
-    kindergartenTeachers: 131.2,
-    primaryTeachers: 558.0,
-    juniorHighTeachers: 338.4,
-    seniorHighTeachers: 168.5,
-    higherEduTeachers: 157.3,
+    kindergartenTeachers: null,
+    primaryTeachers: 563.39,
+    juniorHighTeachers: 348.84,
+    seniorHighTeachers: 166.27,
+    higherEduTeachers: 153.45,
     preschoolGrossRate: 70.5,
     compulsoryRetentionRate: 92.6,
     seniorHighGrossRate: 86.5,
@@ -159,47 +153,47 @@ export const educationData: YearData[] = [
   },
   {
     year: 2015,
-    preschoolEnrollment: 4264.8,
-    primaryEnrollment: 9461.9,
-    juniorHighEnrollment: 4359.5,
-    seniorHighEnrollment: 2377.3,
-    vocationalEnrollment: 2169.6,
+    preschoolEnrollment: 4264.83,
+    primaryEnrollment: 9692.18,
+    juniorHighEnrollment: 4311.95,
+    seniorHighEnrollment: 2374.4,
+    vocationalEnrollment: 1656.7,
     higherEnrollment: 2625.3,
-    graduateEnrollment: 191.1,
+    graduateEnrollment: 191.14,
     kindergartenCount: 22.37,
-    primarySchoolCount: 19.52,
-    juniorHighSchoolCount: 5.21,
-    seniorHighSchoolCount: 1.37,
+    primarySchoolCount: 19.05,
+    juniorHighSchoolCount: 5.24,
+    seniorHighSchoolCount: 1.32,
     higherEduInstitutionCount: 2560,
-    kindergartenTeachers: 145.3,
-    primaryTeachers: 564.0,
-    juniorHighTeachers: 341.1,
-    seniorHighTeachers: 166.3,
-    higherEduTeachers: 160.0,
-    preschoolGrossRate: 75.0,
-    compulsoryRetentionRate: 93.0,
-    seniorHighGrossRate: 87.0,
-    higherEduGrossRate: 40.0,
+    kindergartenTeachers: null,
+    primaryTeachers: 568.51,
+    juniorHighTeachers: 347.56,
+    seniorHighTeachers: 169.54,
+    higherEduTeachers: 157.26,
+    preschoolGrossRate: 75,
+    compulsoryRetentionRate: 93,
+    seniorHighGrossRate: 87,
+    higherEduGrossRate: 40,
   },
   {
     year: 2016,
-    preschoolEnrollment: 4413.9,
-    primaryEnrollment: 9913.0,
-    juniorHighEnrollment: 4329.4,
-    seniorHighEnrollment: 2366.7,
-    vocationalEnrollment: 2097.0,
-    higherEnrollment: 2695.8,
-    graduateEnrollment: 198.1,
+    preschoolEnrollment: 4413.86,
+    primaryEnrollment: 9913.01,
+    juniorHighEnrollment: 4329.37,
+    seniorHighEnrollment: 2366.65,
+    vocationalEnrollment: 1599.01,
+    higherEnrollment: 2695.84,
+    graduateEnrollment: 198.11,
     kindergartenCount: 23.98,
-    primarySchoolCount: 18.97,
+    primarySchoolCount: 17.76,
     juniorHighSchoolCount: 5.21,
-    seniorHighSchoolCount: 1.38,
+    seniorHighSchoolCount: 1.34,
     higherEduInstitutionCount: 2596,
-    kindergartenTeachers: 156.1,
-    primaryTeachers: 594.7,
-    juniorHighTeachers: 341.9,
-    seniorHighTeachers: 165.9,
-    higherEduTeachers: 163.3,
+    kindergartenTeachers: null,
+    primaryTeachers: 578.91,
+    juniorHighTeachers: 348.78,
+    seniorHighTeachers: 173.35,
+    higherEduTeachers: 160.2,
     preschoolGrossRate: 77.4,
     compulsoryRetentionRate: 93.4,
     seniorHighGrossRate: 87.5,
@@ -207,23 +201,23 @@ export const educationData: YearData[] = [
   },
   {
     year: 2017,
-    preschoolEnrollment: 4600.1,
+    preschoolEnrollment: 4600.14,
     primaryEnrollment: 10093.7,
-    juniorHighEnrollment: 4415.1,
-    seniorHighEnrollment: 2374.0,
-    vocationalEnrollment: 2069.5,
-    higherEnrollment: 2753.6,
-    graduateEnrollment: 203.0,
-    kindergartenCount: 25.50,
-    primarySchoolCount: 18.65,
-    juniorHighSchoolCount: 5.24,
-    seniorHighSchoolCount: 1.39,
+    juniorHighEnrollment: 4442.06,
+    seniorHighEnrollment: 2374.55,
+    vocationalEnrollment: 1592.5,
+    higherEnrollment: 2753.59,
+    graduateEnrollment: 263.96,
+    kindergartenCount: 25.5,
+    primarySchoolCount: 16.7009,
+    juniorHighSchoolCount: 5.1894,
+    seniorHighSchoolCount: 1.3555,
     higherEduInstitutionCount: 2631,
-    kindergartenTeachers: 165.9,
-    primaryTeachers: 607.5,
-    juniorHighTeachers: 347.2,
-    seniorHighTeachers: 166.6,
-    higherEduTeachers: 167.3,
+    kindergartenTeachers: 243.21,
+    primaryTeachers: 594.49,
+    juniorHighTeachers: 354.87,
+    seniorHighTeachers: 177.4,
+    higherEduTeachers: 163.32,
     preschoolGrossRate: 79.6,
     compulsoryRetentionRate: 93.8,
     seniorHighGrossRate: 88.3,
@@ -231,23 +225,23 @@ export const educationData: YearData[] = [
   },
   {
     year: 2018,
-    preschoolEnrollment: 4656.4,
-    primaryEnrollment: 10339.1,
-    juniorHighEnrollment: 4652.0,
-    seniorHighEnrollment: 2380.2,
-    vocationalEnrollment: 2084.7,
-    higherEnrollment: 2831.0,
-    graduateEnrollment: 213.0,
+    preschoolEnrollment: 4656.42,
+    primaryEnrollment: 10339.25,
+    juniorHighEnrollment: 4652.59,
+    seniorHighEnrollment: 2375.37,
+    vocationalEnrollment: 1555.26,
+    higherEnrollment: 2831.03,
+    graduateEnrollment: 273.13,
     kindergartenCount: 26.67,
-    primarySchoolCount: 18.35,
-    juniorHighSchoolCount: 5.28,
-    seniorHighSchoolCount: 1.41,
+    primarySchoolCount: 16.1811,
+    juniorHighSchoolCount: 5.1982,
+    seniorHighSchoolCount: 1.3737,
     higherEduInstitutionCount: 2663,
-    kindergartenTeachers: 175.8,
-    primaryTeachers: 620.6,
-    juniorHighTeachers: 358.2,
-    seniorHighTeachers: 167.2,
-    higherEduTeachers: 172.3,
+    kindergartenTeachers: 258.14,
+    primaryTeachers: 609.19,
+    juniorHighTeachers: 363.9,
+    seniorHighTeachers: 181.26,
+    higherEduTeachers: 167.28,
     preschoolGrossRate: 81.7,
     compulsoryRetentionRate: 94.2,
     seniorHighGrossRate: 88.8,
@@ -255,23 +249,23 @@ export const educationData: YearData[] = [
   },
   {
     year: 2019,
-    preschoolEnrollment: 4713.9,
-    primaryEnrollment: 10561.0,
-    juniorHighEnrollment: 4927.9,
-    seniorHighEnrollment: 2423.0,
-    vocationalEnrollment: 2043.2,
-    higherEnrollment: 3031.8,
-    graduateEnrollment: 231.8,
+    preschoolEnrollment: 4713.88,
+    primaryEnrollment: 10561.24,
+    juniorHighEnrollment: 4827.14,
+    seniorHighEnrollment: 2414.31,
+    vocationalEnrollment: 1576.47,
+    higherEnrollment: 3031.53,
+    graduateEnrollment: 286.37,
     kindergartenCount: 28.12,
-    primarySchoolCount: 16.89,
-    juniorHighSchoolCount: 5.29,
-    seniorHighSchoolCount: 1.44,
+    primarySchoolCount: 16.0148,
+    juniorHighSchoolCount: 5.2415,
+    seniorHighSchoolCount: 1.3964,
     higherEduInstitutionCount: 2688,
-    kindergartenTeachers: 184.0,
-    primaryTeachers: 629.3,
-    juniorHighTeachers: 375.0,
-    seniorHighTeachers: 170.8,
-    higherEduTeachers: 177.4,
+    kindergartenTeachers: 276.31,
+    primaryTeachers: 626.91,
+    juniorHighTeachers: 374.74,
+    seniorHighTeachers: 185.92,
+    higherEduTeachers: 174.01,
     preschoolGrossRate: 83.4,
     compulsoryRetentionRate: 94.8,
     seniorHighGrossRate: 89.5,
@@ -279,23 +273,23 @@ export const educationData: YearData[] = [
   },
   {
     year: 2020,
-    preschoolEnrollment: 4818.3,
-    primaryEnrollment: 10725.2,
-    juniorHighEnrollment: 5240.0,
-    seniorHighEnrollment: 2599.8,
-    vocationalEnrollment: 2087.8,
-    higherEnrollment: 3285.3,
-    graduateEnrollment: 252.4,
+    preschoolEnrollment: 4818.26,
+    primaryEnrollment: 10725.35,
+    juniorHighEnrollment: 4914.09,
+    seniorHighEnrollment: 2494.45,
+    vocationalEnrollment: 1663.37,
+    higherEnrollment: 3285.29,
+    graduateEnrollment: 313.96,
     kindergartenCount: 29.17,
-    primarySchoolCount: 15.97,
-    juniorHighSchoolCount: 5.29,
-    seniorHighSchoolCount: 1.46,
+    primarySchoolCount: 15.7979,
+    juniorHighSchoolCount: 5.2805,
+    seniorHighSchoolCount: 1.4235,
     higherEduInstitutionCount: 2738,
-    kindergartenTeachers: 193.1,
-    primaryTeachers: 639.5,
-    juniorHighTeachers: 393.2,
-    seniorHighTeachers: 178.3,
-    higherEduTeachers: 183.0,
+    kindergartenTeachers: 291.34,
+    primaryTeachers: 643.42,
+    juniorHighTeachers: 386.07,
+    seniorHighTeachers: 193.32,
+    higherEduTeachers: 183.3,
     preschoolGrossRate: 85.2,
     compulsoryRetentionRate: 95.2,
     seniorHighGrossRate: 91.2,
@@ -303,23 +297,23 @@ export const educationData: YearData[] = [
   },
   {
     year: 2021,
-    preschoolEnrollment: 4805.2,
-    primaryEnrollment: 10799.2,
-    juniorHighEnrollment: 5474.7,
-    seniorHighEnrollment: 2910.1,
-    vocationalEnrollment: 2217.5,
-    higherEnrollment: 3496.0,
-    graduateEnrollment: 302.7,
+    preschoolEnrollment: 4805.21,
+    primaryEnrollment: 10800,
+    juniorHighEnrollment: 5018.44,
+    seniorHighEnrollment: 2605.03,
+    vocationalEnrollment: 1311.81,
+    higherEnrollment: 3496.13,
+    graduateEnrollment: 333.24,
     kindergartenCount: 29.48,
-    primarySchoolCount: 15.35,
+    primarySchoolCount: 15.43,
     juniorHighSchoolCount: 5.29,
-    seniorHighSchoolCount: 1.50,
-    higherEduInstitutionCount: 3012,
-    kindergartenTeachers: 197.2,
-    primaryTeachers: 649.7,
-    juniorHighTeachers: 410.3,
-    seniorHighTeachers: 196.4,
-    higherEduTeachers: 196.2,
+    seniorHighSchoolCount: 1.46,
+    higherEduInstitutionCount: 2756,
+    kindergartenTeachers: 319.1,
+    primaryTeachers: 660.08,
+    juniorHighTeachers: 397.11,
+    seniorHighTeachers: 202.83,
+    higherEduTeachers: 186.55,
     preschoolGrossRate: 88.1,
     compulsoryRetentionRate: 95.4,
     seniorHighGrossRate: 91.4,
@@ -327,23 +321,23 @@ export const educationData: YearData[] = [
   },
   {
     year: 2022,
-    preschoolEnrollment: 4627.0,
-    primaryEnrollment: 10847.3,
-    juniorHighEnrollment: 5637.9,
-    seniorHighEnrollment: 2785.8,
-    vocationalEnrollment: 2232.9,
-    higherEnrollment: 3859.7,
-    graduateEnrollment: 365.4,
+    preschoolEnrollment: 4627.55,
+    primaryEnrollment: 10700,
+    juniorHighEnrollment: 5120.6,
+    seniorHighEnrollment: 2713.87,
+    vocationalEnrollment: 1339.29,
+    higherEnrollment: 3659.41,
+    graduateEnrollment: 365.36,
     kindergartenCount: 28.92,
     primarySchoolCount: 14.91,
-    juniorHighSchoolCount: 5.29,
-    seniorHighSchoolCount: 1.46,
-    higherEduInstitutionCount: 3013,
-    kindergartenTeachers: 196.5,
-    primaryTeachers: 657.0,
-    juniorHighTeachers: 421.3,
-    seniorHighTeachers: 192.0,
-    higherEduTeachers: 204.0,
+    juniorHighSchoolCount: 5.25,
+    seniorHighSchoolCount: 1.5,
+    higherEduInstitutionCount: 2760,
+    kindergartenTeachers: 324.42,
+    primaryTeachers: 662.94,
+    juniorHighTeachers: 402.52,
+    seniorHighTeachers: 213.32,
+    higherEduTeachers: 196.31,
     preschoolGrossRate: 89.7,
     compulsoryRetentionRate: 95.5,
     seniorHighGrossRate: 91.6,
@@ -351,27 +345,75 @@ export const educationData: YearData[] = [
   },
   {
     year: 2023,
-    preschoolEnrollment: 4092.7,
-    primaryEnrollment: 10748.5,
-    juniorHighEnrollment: 5609.1,
-    seniorHighEnrollment: 3152.2,
-    vocationalEnrollment: 2195.3,
-    higherEnrollment: 4310.9,
-    graduateEnrollment: 490.9,
+    preschoolEnrollment: 4092.98,
+    primaryEnrollment: 10800,
+    juniorHighEnrollment: 5243.69,
+    seniorHighEnrollment: 2803.63,
+    vocationalEnrollment: 1298.46,
+    higherEnrollment: 3775.01,
+    graduateEnrollment: 388.29,
     kindergartenCount: 27.44,
     primarySchoolCount: 14.35,
-    juniorHighSchoolCount: 5.17,
-    seniorHighSchoolCount: 1.50,
-    higherEduInstitutionCount: 3074,
-    kindergartenTeachers: 185.3,
-    primaryTeachers: 655.1,
-    juniorHighTeachers: 424.4,
-    seniorHighTeachers: 208.9,
-    higherEduTeachers: 215.4,
+    juniorHighSchoolCount: 5.23,
+    seniorHighSchoolCount: 1.54,
+    higherEduInstitutionCount: 2822,
+    kindergartenTeachers: 307.37,
+    primaryTeachers: 665.63,
+    juniorHighTeachers: 408.31,
+    seniorHighTeachers: 221.48,
+    higherEduTeachers: 206.09,
     preschoolGrossRate: 91.1,
     compulsoryRetentionRate: 95.7,
-    seniorHighGrossRate: 92.8,
+    seniorHighGrossRate: 91.8,
     higherEduGrossRate: 60.2,
+  },
+  {
+    year: 2024,
+    preschoolEnrollment: 3583.99,
+    primaryEnrollment: 10584.37,
+    juniorHighEnrollment: 5386.16,
+    seniorHighEnrollment: 2922.28,
+    vocationalEnrollment: 1229.33,
+    higherEnrollment: 3891.26,
+    graduateEnrollment: 409.54,
+    kindergartenCount: 25.33,
+    primarySchoolCount: 13.63,
+    juniorHighSchoolCount: 5.21,
+    seniorHighSchoolCount: 1.58,
+    higherEduInstitutionCount: 2870,
+    kindergartenTeachers: 283.19,
+    primaryTeachers: 659.01,
+    juniorHighTeachers: 414.88,
+    seniorHighTeachers: 230.18,
+    higherEduTeachers: 214.99,
+    preschoolGrossRate: 92,
+    compulsoryRetentionRate: 95.9,
+    seniorHighGrossRate: 92,
+    higherEduGrossRate: 60.8,
+  },
+  {
+    year: 2025,
+    preschoolEnrollment: 3225.52,
+    primaryEnrollment: 10178.29,
+    juniorHighEnrollment: 5509.34,
+    seniorHighEnrollment: 3039.5,
+    vocationalEnrollment: 1118.77,
+    higherEnrollment: 3953.96,
+    graduateEnrollment: 429.95,
+    kindergartenCount: 23.19,
+    primarySchoolCount: 12.83,
+    juniorHighSchoolCount: 5.16,
+    seniorHighSchoolCount: 1.61,
+    higherEduInstitutionCount: 2919,
+    kindergartenTeachers: 261.26,
+    primaryTeachers: 645.82,
+    juniorHighTeachers: 423.95,
+    seniorHighTeachers: 237.2,
+    higherEduTeachers: 221.02,
+    preschoolGrossRate: 92.9,
+    compulsoryRetentionRate: 96.1,
+    seniorHighGrossRate: 92,
+    higherEduGrossRate: 61.3,
   },
 ]
 
@@ -385,33 +427,33 @@ export interface MetricMeta {
 }
 
 export const enrollmentMetrics: MetricMeta[] = [
-  { key: 'preschoolEnrollment', label: '学前教育（在园幼儿）', unit: '万人', color: '#f97316' },
-  { key: 'primaryEnrollment', label: '小学（在校生）', unit: '万人', color: '#22c55e' },
-  { key: 'juniorHighEnrollment', label: '初中（在校生）', unit: '万人', color: '#3b82f6' },
-  { key: 'seniorHighEnrollment', label: '普通高中（在校生）', unit: '万人', color: '#a855f7' },
-  { key: 'vocationalEnrollment', label: '中等职业学校（在校生）', unit: '万人', color: '#ec4899' },
-  { key: 'higherEnrollment', label: '普通高校本专科（在校生）', unit: '万人', color: '#ef4444' },
-  { key: 'graduateEnrollment', label: '研究生（在校生）', unit: '万人', color: '#14b8a6' },
+  { key: 'preschoolEnrollment', label: '学前教育', unit: '万人', color: '#c5503e' },
+  { key: 'primaryEnrollment', label: '小学', unit: '万人', color: '#33736f' },
+  { key: 'juniorHighEnrollment', label: '初中', unit: '万人', color: '#345f8b' },
+  { key: 'seniorHighEnrollment', label: '普通高中', unit: '万人', color: '#9b6b36' },
+  { key: 'vocationalEnrollment', label: '中等职业教育', unit: '万人', color: '#8a526f' },
+  { key: 'higherEnrollment', label: '普通、职业本专科', unit: '万人', color: '#4f7653' },
+  { key: 'graduateEnrollment', label: '研究生', unit: '万人', color: '#6d6092' },
 ]
 
 export const schoolCountMetrics: MetricMeta[] = [
-  { key: 'kindergartenCount', label: '幼儿园', unit: '万所', color: '#f97316' },
-  { key: 'primarySchoolCount', label: '小学', unit: '万所', color: '#22c55e' },
-  { key: 'juniorHighSchoolCount', label: '初中', unit: '万所', color: '#3b82f6' },
-  { key: 'seniorHighSchoolCount', label: '普通高中', unit: '万所', color: '#a855f7' },
+  { key: 'kindergartenCount', label: '幼儿园', unit: '万所', color: '#c5503e' },
+  { key: 'primarySchoolCount', label: '普通小学', unit: '万所', color: '#33736f' },
+  { key: 'juniorHighSchoolCount', label: '初中', unit: '万所', color: '#345f8b' },
+  { key: 'seniorHighSchoolCount', label: '普通高中', unit: '万所', color: '#9b6b36' },
 ]
 
 export const teacherMetrics: MetricMeta[] = [
-  { key: 'kindergartenTeachers', label: '幼儿园专任教师', unit: '万人', color: '#f97316' },
-  { key: 'primaryTeachers', label: '小学专任教师', unit: '万人', color: '#22c55e' },
-  { key: 'juniorHighTeachers', label: '初中专任教师', unit: '万人', color: '#3b82f6' },
-  { key: 'seniorHighTeachers', label: '普通高中专任教师', unit: '万人', color: '#a855f7' },
-  { key: 'higherEduTeachers', label: '高校专任教师', unit: '万人', color: '#ef4444' },
+  { key: 'kindergartenTeachers', label: '学前教育专任教师', unit: '万人', color: '#c5503e' },
+  { key: 'primaryTeachers', label: '小学专任教师', unit: '万人', color: '#33736f' },
+  { key: 'juniorHighTeachers', label: '初中专任教师', unit: '万人', color: '#345f8b' },
+  { key: 'seniorHighTeachers', label: '普通高中专任教师', unit: '万人', color: '#9b6b36' },
+  { key: 'higherEduTeachers', label: '普通、职业高校专任教师', unit: '万人', color: '#4f7653' },
 ]
 
 export const grossRateMetrics: MetricMeta[] = [
-  { key: 'preschoolGrossRate', label: '学前三年毛入学率', unit: '%', color: '#f97316' },
-  { key: 'compulsoryRetentionRate', label: '九年义务教育巩固率', unit: '%', color: '#22c55e' },
-  { key: 'seniorHighGrossRate', label: '高中阶段毛入学率', unit: '%', color: '#3b82f6' },
-  { key: 'higherEduGrossRate', label: '高等教育毛入学率', unit: '%', color: '#a855f7' },
+  { key: 'preschoolGrossRate', label: '学前教育毛入园率', unit: '%', color: '#c5503e' },
+  { key: 'compulsoryRetentionRate', label: '九年义务教育巩固率', unit: '%', color: '#33736f' },
+  { key: 'seniorHighGrossRate', label: '高中阶段毛入学率', unit: '%', color: '#345f8b' },
+  { key: 'higherEduGrossRate', label: '高等教育毛入学率', unit: '%', color: '#9b6b36' },
 ]
